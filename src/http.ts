@@ -1,11 +1,15 @@
+import 'reflect-metadata'
 import express from 'express'
 import path from 'path'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import mongoose from 'mongoose'
 
 const app = express()
 
 const server = createServer(app)
+
+mongoose.connect('mongodb://localhost:27817/ignitesocket').then((con) => console.log('Connected to DB'))
 
 app.use(express.static(path.join(__dirname, "..", "public")))
 
