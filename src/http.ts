@@ -9,14 +9,17 @@ const app = express()
 
 const server = createServer(app)
 
-mongoose.connect('mongodb://localhost:27817/ignitesocket').then((con) => console.log('Connected to DB'))
+mongoose.connect('mongodb://localhost/ignitesocket', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 
 app.use(express.static(path.join(__dirname, "..", "public")))
 
 const io = new Server(server)
 
 io.on("connection", (socket) => {
-    console.log("Socket", socket.id)
+    //console.log("Socket", socket.id)
 })
 
 app.get("/", (request, response) => {
