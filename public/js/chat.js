@@ -39,6 +39,11 @@ function onLoad() {
             }
         })
     })
+
+    socket.on('error', (error) => {
+        alert(error.message)
+        window.location.href = "/"  
+    })
 }
 
 function addUser(user) {

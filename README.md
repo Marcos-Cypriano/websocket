@@ -10,5 +10,4 @@ To run:
 
 
 # TODO:
-    - impedir cadastros nulos
     - o cadastro de usuário está passando as informações pela query na url, alterar para parametros no body
