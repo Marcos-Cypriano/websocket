@@ -8,10 +8,13 @@ import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
 
 io.on("connect", socket => {
     // io.emit envia informação global, socket.emit informação controlada
+
+    // Entry form
     socket.on("start", async (data) => {
         const { email, name, avatar } = data
         const createUserService = container.resolve(CreateUserService)
 
+        // If all information was filled
         if (email && name && avatar) {
             const user = await createUserService.execute({
                 email,
@@ -21,11 +24,13 @@ io.on("connect", socket => {
             })
     
             socket.broadcast.emit("new_users", user)
+        } else {
+            // Return error if any the form has any null information
+            socket.emit("error", { message: "Fill in all informations."})
         }
-        
-        socket.emit("error", { message: "Fill in all informations."})
     })
 
+    // Get all users to screen on side bar
     socket.on("get_users", async (callback) => {
         const getAllUsersService = container.resolve(GetAllUsersService)
         const users = await getAllUsersService.execute()
@@ -33,6 +38,7 @@ io.on("connect", socket => {
         callback(users)
     })
 
+    // When clicking on a user and start a chat
     socket.on("start_chat", async (data, callback) => {
         const getChatRoomByUsersService = container.resolve(GetChatRoomByUsersService)
         const createChatRoomService = container.resolve(CreateChatRoomService)
@@ -40,8 +46,10 @@ io.on("connect", socket => {
 
         const userLogged = await getUserBySocketIdService.execute(socket.id)
 
+        // If there is already a chat
         let room = await getChatRoomByUsersService.execute([data.idUser, userLogged._id])
 
+        // Create a new if there is not already a chat
         if (!room) {
             room = await createChatRoomService.execute([data.idUser, userLogged._id])
         }

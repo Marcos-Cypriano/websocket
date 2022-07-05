@@ -8,6 +8,7 @@ function onLoad() {
     const avatar = urlParams.get('avatar')
     const email = urlParams.get('email')
 
+    // Filling logged user's info
     document.querySelector(".user_logged").innerHTML += `
         <img
             class="avatar_user_logged"
@@ -72,6 +73,14 @@ document.getElementById("users_list").addEventListener("click", (e) => {
             console.log(data)
             roomId = data.idChatRoom
         })
+    }
+})
+
+document.getElementById("user_message").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        const message = e.target.value
+
+        console.log("Message", message)
     }
 })
 
