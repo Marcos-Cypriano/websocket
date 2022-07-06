@@ -1,6 +1,6 @@
 const socket = io("http://localhost:3000")
 
-let roomId = ''
+let idChatRoom = ''
 
 function onLoad() {
     const urlParams = new URLSearchParams(window.location.search)
@@ -32,7 +32,6 @@ function onLoad() {
     })
 
     socket.emit("get_users", (users) => {
-        console.log("GetUsers", users)
 
         users.map( user => {
             if(user.email != email) {
@@ -45,6 +44,28 @@ function onLoad() {
         alert(error.message)
         window.location.href = "/"  
     })
+
+    socket.on("message", (data) => {
+        addMessage(data)
+    })
+}
+
+function addMessage(data) {
+    const divMessageUser = document.getElementById("message_user")
+
+    divMessageUser.innerHTML += `
+    <span class="user_name user_name_date">
+        <img
+        class="img_user"
+        src=${data.user.avatar}
+        />
+        <strong> ${data.user.name}</strong>
+        <span> ${dayjs(data.message.createdAt).format("DD/MM/YYYY HH:mm")}</span>
+    </span>
+    <div class="messages">
+        <span class="chat_message"> ${data.message.text}</span>
+    </div>
+    `
 }
 
 function addUser(user) {
@@ -66,12 +87,22 @@ function addUser(user) {
 
 document.getElementById("users_list").addEventListener("click", (e) => {
 
+    document.getElementById("message_user").innerHTML = ""
+
     if(e.target && e.target.matches("li.user_name_list")) {
         const idUser = e.target.getAttribute("idUser")
         
-        socket.emit("start_chat", {idUser}, (data) => {
-            console.log(data)
-            roomId = data.idChatRoom
+        socket.emit("start_chat", {idUser}, (response) => {
+            idChatRoom = response.room.idChatRoom
+
+            response.messages.forEach(message => {
+                const data = {
+                    message,
+                    user: message.to
+                }
+
+                addMessage(data)
+            })
         })
     }
 })
@@ -80,7 +111,14 @@ document.getElementById("user_message").addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         const message = e.target.value
 
-        console.log("Message", message)
+        const data = {
+            message,
+            idChatRoom
+        }
+
+        socket.emit("message", data)
+
+        e.target.value = ''
     }
 })
 
