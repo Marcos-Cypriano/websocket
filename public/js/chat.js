@@ -72,7 +72,7 @@ function addUser(user) {
     const usersList = document.getElementById("users_list")
     usersList.innerHTML += `
     <li
-        class="user_name_list"
+        class="user_name_list "
         id="user_${user._id}"
         idUser="${user._id}"
     >
@@ -87,7 +87,13 @@ function addUser(user) {
 
 document.getElementById("users_list").addEventListener("click", (e) => {
 
+    // Cleaning elements
+    document.querySelectorAll(".user_name_list").forEach(user => {
+        user.classList.remove("bg-gray-700")
+    })
+
     document.getElementById("message_user").innerHTML = ""
+
 
     if(e.target && e.target.matches("li.user_name_list")) {
         const idUser = e.target.getAttribute("idUser")
@@ -104,6 +110,9 @@ document.getElementById("users_list").addEventListener("click", (e) => {
                 addMessage(data)
             })
         })
+
+        // Highlighting chosen user
+        document.getElementById(`user_${idUser}`).classList.add("bg-gray-700")
     }
 })
 
