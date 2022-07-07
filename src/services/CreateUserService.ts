@@ -23,7 +23,7 @@ class CreateUserService {
                 $set: {socketId, avatar, name}
             },
             {
-                new: true
+                useFindAndModify: false
             }
             )
 

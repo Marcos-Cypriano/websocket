@@ -4,6 +4,7 @@ import { CreateChatRoomService } from '../services/CreateChatRoomService'
 import { CreateMessageService } from '../services/CreateMessageService'
 import { CreateUserService } from '../services/CreateUserService'
 import { GetAllUsersService } from '../services/GetAllUsersService'
+import { GetChatRoomByIdService } from '../services/GetChatRoomByIdService'
 import { GetChatRoomByUsersService } from '../services/GetChatRoomByUsersService'
 import { GetMessageByChatRoomService } from '../services/GetMessageByChatRoomService'
 import { GetUserBySocketIdService } from '../services/GetUserBySocketIdService'
@@ -68,6 +69,7 @@ io.on("connect", socket => {
     socket.on("message", async (data) => {
         const getUserBySocketIdService = container.resolve(GetUserBySocketIdService)
         const createMessageService = container.resolve(CreateMessageService)
+        const getChatRoomByIdService = container.resolve(GetChatRoomByIdService)
 
         const user = await getUserBySocketIdService.execute(socket.id)
 
@@ -78,9 +80,21 @@ io.on("connect", socket => {
             roomId: data.idChatRoom
         })
 
+        // Sending message to all chatroom users
         io.to(data.idChatRoom).emit("message", {
             message,
             user
+        })
+
+        // Send notification
+        const room = await getChatRoomByIdService.execute(data.idChatRoom)
+
+        const userFrom = room.idUsers.find((response) => String(response._id) != String(user._id))
+
+        io.to(userFrom.socketId).emit("notification", {
+            newMessage: true,
+            roomId: data.idChatRoom,
+            from: user
         })
 
     })

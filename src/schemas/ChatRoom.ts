@@ -3,7 +3,7 @@ import { User } from "./User";
 import { v4 as uuid } from 'uuid'
 
 type ChatRoom = Document & {
-    idUSers: User[],
+    idUsers: User[],
     idChatRoom: string
 }
 
