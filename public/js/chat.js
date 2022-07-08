@@ -71,7 +71,7 @@ function addMessage(data) {
         class="img_user"
         src=${data.user.avatar}
         />
-        <strong> ${data.user.name}</strong>
+        <strong> ${data.user.name} &nbsp;</strong>
         <span> ${dayjs(data.message.createdAt).format("DD/MM/YYYY HH:mm")}</span>
     </span>
     <div class="messages">
@@ -99,14 +99,27 @@ function addUser(user) {
 
 document.getElementById("users_list").addEventListener("click", (e) => {
 
+    // Displaying text input
+    document.getElementById("user_message").classList.remove("hidden")
+
     // Cleaning elements
-    document.querySelectorAll(".user_name_list").forEach(user => {
-        user.classList.remove("bg-gray-700")
+    document.querySelectorAll("li.user_name_list").forEach(user => {
+        user.classList.remove("user_in_focus")
     })
+
     document.getElementById("message_user").innerHTML = ""
+
     
     if(e.target && e.target.matches("li.user_name_list")) {
         const idUser = e.target.getAttribute("idUser")
+
+        e.target.classList.add("user_in_focus")
+
+        const notification = document.querySelector(`#user_${idUser} .notification`)
+
+        if (notification) {
+            notification.remove()
+        }
         
         socket.emit("start_chat", {idUser}, (response) => {
             idChatRoom = response.room.idChatRoom
@@ -120,9 +133,6 @@ document.getElementById("users_list").addEventListener("click", (e) => {
                 addMessage(data)
             })
         })
-
-        // Highlighting chosen user
-        document.getElementById(`user_${idUser}`).classList.add("bg-gray-700")
     }
 })
 
